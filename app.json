@@ -1,0 +1,12 @@
+{
+  "name": "SoFloFitness",
+  "displayName": "SoFloFitness",
+  "expo": {
+    "name": "SoFloFitness",
+    "slug": "SoFloFitness",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
