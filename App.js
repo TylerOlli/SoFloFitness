@@ -1,19 +1,25 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-
-import { NavigationContainer } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import { View } from 'react-native';
+import { View, StatusBar } from 'react-native';
 import AddEntry from './components/AddEntry';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducer from './reducers';
+import { NavigationContainer } from '@react-navigation/native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import History from './components/History';
 import { purple, white } from './utils/colors';
-
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import Constants from 'expo-constants';
+
+function StatusBarComponent({ backgroundColor, ...props }) {
+  return (
+    <View style={{ backgroundColor, height: Constants.statusBarHeight }}>
+      <StatusBar translucent backgroundColor={backgroundColor} {...props} />
+    </View>
+  );
+}
 
 const Tabs =
   Platform.OS === 'ios'
@@ -25,6 +31,10 @@ export default class App extends React.Component {
     return (
       <Provider store={createStore(reducer)}>
         <View style={{ flex: 1 }}>
+          <StatusBarComponent
+            backgroundColor={purple}
+            barStyle='light-content'
+          />
           <NavigationContainer>
             <Tabs.Navigator
               initialRouteName='AddEntry'
