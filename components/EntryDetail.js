@@ -9,15 +9,9 @@ import { removeEntry } from '../utils/api';
 import TextButton from './TextButton';
 
 class EntryDetail extends Component {
-  setTitle = (entryId) => {
-    if (!entryId) return;
-
-    const year = entryId.slice(0, 4);
-    const month = entryId.slice(5, 7);
-    const day = entryId.slice(8);
-
+  setTitle = (formattedDate) => {
     this.props.navigation.setOptions({
-      title: `${month}/${day}/${year}`,
+      title: formattedDate,
     });
   };
 
@@ -33,11 +27,11 @@ class EntryDetail extends Component {
   }
 
   render() {
-    const { entryId, metrics } = this.props;
-    this.setTitle(entryId);
+    const { entryId, metrics, formattedDate } = this.props;
+    this.setTitle(formattedDate);
     return (
       <View style={styles.container}>
-        <MetricCard metrics={metrics} date={entryId} />
+        <MetricCard metrics={metrics} date={formattedDate} />
         <TextButton onPress={this.reset} style={{ margin: 20 }}>
           Reset
         </TextButton>
@@ -63,8 +57,9 @@ function mapStateToProps(state, { route }) {
 }
 
 function mapDispatchToProps(dispatch, { route, navigation }) {
-  const { entryId } = route.params;
+  const { entryId, formattedDate } = route.params;
   return {
+    formattedDate,
     remove: () =>
       dispatch(
         addEntry({
