@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { receiveEntries, addEntry } from '../actions';
 import { timeToString, getDailyReminderValue } from '../utils/helpers';
 import { fetchCalendarResults } from '../utils/api';
-import UdaciFitnessCalendar from 'udacifitness-calendar';
+import UdaciFitnessCalendar from './Udacifitness-calendar';
 import { white } from '../utils/colors';
 import DateHeader from './DateHeader';
 import MetricCard from './MetricCard';
@@ -44,7 +44,11 @@ class History extends Component {
           <Text style={styles.noDataText}>{today}</Text>
         </View>
       ) : (
-        <TouchableOpacity onPress={() => console.log('Pressed!')}>
+        <TouchableOpacity
+          onPress={() =>
+            this.props.navigation.navigate('EntryDetail', { entryId: key })
+          }
+        >
           <MetricCard date={formattedDate} metrics={metrics} />
         </TouchableOpacity>
       )}
