@@ -9,7 +9,7 @@ import {
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { purple, gray, white } from '../utils/colors';
 
-export default function SteppersComponent({
+export default function UdaciSteppers({
   max,
   unit,
   step,
