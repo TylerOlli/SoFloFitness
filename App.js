@@ -14,6 +14,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { createStackNavigator } from '@react-navigation/stack';
 import EntryDetail from './components/EntryDetail';
+import Live from './components/Live';
 
 function UdaciStatusBar({ backgroundColor, ...props }) {
   return (
@@ -23,75 +24,111 @@ function UdaciStatusBar({ backgroundColor, ...props }) {
   );
 }
 
-const Tabs =
+// Config for TabNav
+const RouteConfigs = {
+  History: {
+    name: 'History',
+    component: History,
+    options: {
+      tabBarIcon: ({ tintColor }) => (
+        <Ionicons name='ios-bookmarks' size={30} color={tintColor} />
+      ),
+      title: 'History',
+    },
+  },
+  AddEntry: {
+    component: AddEntry,
+    name: 'Add Entry',
+    options: {
+      tabBarIcon: ({ tintColor }) => (
+        <FontAwesome name='plus-square' size={30} color={tintColor} />
+      ),
+      title: 'Add Entry',
+    },
+  },
+  Live: {
+    component: Live,
+    name: 'Live',
+    options: {
+      tabBarIcon: ({ tintColor }) => (
+        <Ionicons name='ios-speedometer' size={30} color={tintColor} />
+      ),
+      title: 'Live',
+    },
+  },
+};
+
+const TabNavigatorConfig = {
+  navigationOptions: {
+    header: null,
+  },
+  tabBarOptions: {
+    activeTintColor: Platform.OS === 'ios' ? purple : white,
+    style: {
+      height: 56,
+      backgroundColor: Platform.OS === 'ios' ? white : purple,
+      shadowColor: 'rgba(0, 0, 0, 0.24)',
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowRadius: 6,
+      shadowOpacity: 1,
+    },
+  },
+};
+
+const Tab =
   Platform.OS === 'ios'
     ? createBottomTabNavigator()
     : createMaterialTopTabNavigator();
 
 const TabNav = () => (
-  <Tabs.Navigator
-    initialRouteName='AddEntry'
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ color, size }) => {
-        let icon;
-        if (route.name === 'Add Entry') {
-          icon = <FontAwesome name='plus-square' size={size} color={color} />;
-        } else if (route.name === 'History') {
-          icon = <Ionicons name='ios-bookmarks' size={size} color={color} />;
-        }
-        return icon;
-      },
-    })}
-    tabBarOptions={{
-      header: null,
-      activeTintColor: Platform.OS === 'ios' ? purple : white,
-      showIcon: true,
-      style: {
-        height: 80,
-        backgroundColor: Platform.OS === 'ios' ? white : purple,
-        shadowColor: 'rgba(0, 0, 0, 0.24)',
-        shadowOffset: {
-          width: 0,
-          height: 3,
-        },
-        shadowRadius: 6,
-        shadowOpacity: 1,
-      },
-    }}
-  >
-    <Tabs.Screen name='Add Entry' component={AddEntry} />
-    <Tabs.Screen name='History' component={History} />
-  </Tabs.Navigator>
+  <Tab.Navigator {...TabNavigatorConfig}>
+    <Tab.Screen {...RouteConfigs['History']} />
+    <Tab.Screen {...RouteConfigs['AddEntry']} />
+    <Tab.Screen {...RouteConfigs['Live']} />
+  </Tab.Navigator>
 );
 
+// Config for StackNav
+const StackNavigatorConfig = {
+  headerMode: 'screen',
+};
+const StackConfig = {
+  TabNav: {
+    name: 'Home',
+    component: TabNav,
+    options: { headerShown: false },
+  },
+  EntryDetail: {
+    name: 'EntryDetail',
+    component: EntryDetail,
+    options: {
+      headerTintColor: white,
+      headerStyle: {
+        backgroundColor: purple,
+      },
+    },
+  },
+};
 const Stack = createStackNavigator();
 const MainNav = () => (
-  <Stack.Navigator headerMode='screen'>
-    <Stack.Screen
-      name='Home'
-      component={TabNav}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name='EntryDetail'
-      component={EntryDetail}
-      options={{
-        headerTintColor: white,
-        headerStyle: {
-          backgroundColor: purple,
-        },
-      }}
-    />
+  <Stack.Navigator {...StackNavigatorConfig}>
+    <Stack.Screen {...StackConfig['TabNav']} />
+    <Stack.Screen {...StackConfig['EntryDetail']} />
   </Stack.Navigator>
 );
 
-export default class App extends Component {
+// App
+export default class App extends React.Component {
   render() {
+    const store = createStore(reducer);
     return (
-      <Provider store={createStore(reducer)}>
+      <Provider store={store}>
         <View style={{ flex: 1 }}>
+          <UdaciStatusBar backgroundColor={purple} barStyle='light-content' />
           <NavigationContainer>
-            <UdaciStatusBar backgroundColor={purple} barStyle='light-content' />
             <MainNav />
           </NavigationContainer>
         </View>
