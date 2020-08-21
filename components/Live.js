@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import * as Permissions from 'expo-permissions';
-import * as Location from 'expo-location';
 import { Foundation } from '@expo/vector-icons';
 import { purple, white } from '../utils/colors';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
+import { calculateDirection } from '../utils/helpers';
 
 export default class Live extends Component {
   state = {
@@ -17,22 +18,24 @@ export default class Live extends Component {
     status: null,
     direction: '',
   };
+
   componentDidMount() {
-    Permissions.getAsync(Permissions.LOCATION)
+    this.askPermission();
+  }
+
+  askPermission = () => {
+    Permissions.askAsync(Permissions.LOCATION)
       .then(({ status }) => {
         if (status === 'granted') {
           return this.setLocation();
         }
-
         this.setState(() => ({ status }));
       })
-      .catch((error) => {
-        console.warn('Error getting Location permission: ', error);
+      .catch((error) =>
+        console.warn('error asking Location permission: ', error)
+      );
+  };
 
-        this.setState(() => ({ status: 'undetermined' }));
-      });
-  }
-  askPermission = () => {};
   setLocation = () => {
     Location.watchPositionAsync(
       {
@@ -42,8 +45,6 @@ export default class Live extends Component {
       },
       ({ coords }) => {
         const newDirection = calculateDirection(coords.heading);
-        const { direction } = this.state;
-
         this.setState(() => ({
           coords,
           status: 'granted',
@@ -52,13 +53,13 @@ export default class Live extends Component {
       }
     );
   };
+
   render() {
-    const { status } = this.state;
+    const { status, coords, direction } = this.state;
 
     if (status === null) {
       return <ActivityIndicator style={{ marginTop: 30 }} />;
     }
-
     if (status === 'denied') {
       return (
         <View style={styles.center}>
@@ -70,7 +71,6 @@ export default class Live extends Component {
         </View>
       );
     }
-
     if (status === 'undetermined') {
       return (
         <View style={styles.center}>
@@ -82,21 +82,24 @@ export default class Live extends Component {
         </View>
       );
     }
-
     return (
       <View style={styles.container}>
         <View style={styles.directionContainer}>
           <Text style={styles.header}>You're heading</Text>
-          <Text style={styles.direction}>North</Text>
+          <Text style={styles.direction}>{direction}</Text>
         </View>
         <View style={styles.metricContainer}>
           <View style={styles.metric}>
             <Text style={[styles.header, { color: white }]}>Altitude</Text>
-            <Text style={[styles.subHeader, { color: white }]}>{200} feet</Text>
+            <Text style={[styles.subHeader, { color: white }]}>
+              {Math.round(coords.altitude * 3.2808)} Feet
+            </Text>
           </View>
           <View style={styles.metric}>
             <Text style={[styles.header, { color: white }]}>Speed</Text>
-            <Text style={[styles.subHeader, { color: white }]}>{300} MPH</Text>
+            <Text style={[styles.subHeader, { color: white }]}>
+              {(coords.speed * 2.2369).toFixed(1)} MPH
+            </Text>
           </View>
         </View>
       </View>
