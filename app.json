@@ -1,13 +1,16 @@
 {
+  "name": "SoFloFitness",
+  "displayName": "SoFloFitness",
   "expo": {
-    "orientation": "portrait",
     "name": "SoFloFitness",
-    "description": "The best local fitness tracker in South Florida",
-    "slug": "soflofitness",
-    "version": "1.0",
-    "icon": "https://icon-library.com/images/triathlon-icon/triathlon-icon-3.jpg",
+    "description": "The best triathlon tracker ever",
+    "slug": "SoFloFitness",
+    "version": "1.0.0",
+    "assetBundlePatterns": ["**/*"],
+    "orientation": "portrait",
+    "icon": "./images/SoFloFitness-Logo.png",
     "notification": {
-      "icon": "https://icon-library.com/images/triathlon-icon/triathlon-icon-3.jpg"
+      "icon": "./images/SoFloFitness-Logo.png"
     },
     "ios": {
       "bundleIdentifier": "org.soflofitness.exp"
