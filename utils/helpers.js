@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, AsyncStorage } from 'react-native';
 import {
   FontAwesome,
   MaterialIcons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
 import { red, orange, blue, lightPurp, pink, white } from './colors';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+
+const NOTIFICATION_KEY = 'UdaciFitness:notifications';
 
 export function getDailyReminderValue() {
   return {
@@ -144,4 +148,63 @@ export function timeToString(time = Date.now()) {
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
   );
   return todayUTC.toISOString().split('T')[0];
+}
+
+export function clearLocalNotification() {
+  return AsyncStorage.removeItem(NOTIFICATION_KEY).then(
+    Notifications.cancelAllScheduledNotificationsAsync
+  );
+}
+
+function createNotification() {
+  return {
+    title: 'Log your stats!',
+    body: "👋 don't forget to log your stats for today!",
+    ios: {
+      sound: true,
+    },
+    android: {
+      sound: true,
+      priority: 'high',
+      sticky: false,
+      vibrate: true,
+    },
+  };
+}
+
+export function setLocalNotification() {
+  AsyncStorage.getItem(NOTIFICATION_KEY)
+    .then(JSON.parse)
+    .then((data) => {
+      if (data === null) {
+        Permissions.askAsync(Permissions.NOTIFICATIONS).then(({ status }) => {
+          console.log(status);
+          if (status === 'granted') {
+            Notifications.cancelAllScheduledNotificationsAsync();
+
+            let tomorrow = new Date();
+
+            Notifications.scheduleLocalNotificationAsync(
+              {
+                title: 'Log your stats!',
+                body: "👋 don't forget to log your stats for today!",
+                ios: {
+                  sound: true,
+                },
+                android: {
+                  sound: true,
+                  sticky: false,
+                },
+              },
+              {
+                time: tomorrow.getTime() + 6000, // almost every minute it should show the notification
+                repeat: 'minute',
+              }
+            );
+
+            AsyncStorage.setItem(NOTIFICATION_KEY, JSON.stringify(true));
+          }
+        });
+      }
+    });
 }
